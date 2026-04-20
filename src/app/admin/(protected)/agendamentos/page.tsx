@@ -1,139 +1,86 @@
 "use client";
 
-import { useState } from "react";
-import Link from "next/link";
-import { STATUS_CONFIG, COMPANY } from "@/lib/constants";
+import { useEffect, useState } from "react";
+import { STATUS_CONFIG } from "@/lib/constants";
 import { formatCurrency, getWhatsAppLink, formatDate } from "@/lib/utils";
-
-type AppointmentStatus = "pending" | "confirmed" | "in_progress" | "done" | "cancelled";
-
-interface MockAppointment {
-  id: string;
-  tracking_id: string;
-  customer_name: string;
-  customer_phone: string;
-  customer_email: string;
-  car_brand: string;
-  car_model: string;
-  car_year: number;
-  car_plate: string;
-  service_name: string;
-  appointment_date: string;
-  time_slot: string;
-  status: AppointmentStatus;
-  total_value: number | null;
-  admin_notes: string;
-  client_notes: string;
-  created_at: string;
-}
-
-const MOCK_APPOINTMENTS: MockAppointment[] = [
-  {
-    id: "1",
-    tracking_id: "TZM-001",
-    customer_name: "João Silva",
-    customer_phone: "(74) 99912-3456",
-    customer_email: "joao@email.com",
-    car_brand: "Chevrolet",
-    car_model: "Onix",
-    car_year: 2021,
-    car_plate: "ABC1D23",
-    service_name: "Troca de Óleo",
-    appointment_date: "2026-04-22",
-    time_slot: "09:00",
-    status: "pending",
-    total_value: null,
-    admin_notes: "",
-    client_notes: "",
-    created_at: "2026-04-20T10:00:00",
-  },
-  {
-    id: "2",
-    tracking_id: "TZM-002",
-    customer_name: "Maria Santos",
-    customer_phone: "(74) 99887-6543",
-    customer_email: "",
-    car_brand: "Fiat",
-    car_model: "Uno",
-    car_year: 2019,
-    car_plate: "",
-    service_name: "Revisão Completa",
-    appointment_date: "2026-04-22",
-    time_slot: "14:00",
-    status: "confirmed",
-    total_value: null,
-    admin_notes: "",
-    client_notes: "",
-    created_at: "2026-04-19T15:30:00",
-  },
-  {
-    id: "3",
-    tracking_id: "TZM-003",
-    customer_name: "Carlos Ferreira",
-    customer_phone: "(74) 99956-7890",
-    customer_email: "carlos@email.com",
-    car_brand: "Volkswagen",
-    car_model: "Gol",
-    car_year: 2018,
-    car_plate: "DEF5G67",
-    service_name: "Freios",
-    appointment_date: "2026-04-21",
-    time_slot: "10:00",
-    status: "in_progress",
-    total_value: 350,
-    admin_notes: "Pastilhas e discos dianteiros trocados",
-    client_notes: "Trocamos pastilhas e discos dianteiros. Recomendamos revisão dos traseiros em 6 meses.",
-    created_at: "2026-04-18T09:00:00",
-  },
-];
+import { fetchAppointments, updateAppointmentStatus, updateAppointmentDetails } from "@/lib/api";
+import type { Appointment, AppointmentStatus } from "@/lib/types";
 
 const STATUS_OPTIONS: AppointmentStatus[] = ["pending", "confirmed", "in_progress", "done", "cancelled"];
 
 export default function AdminAgendamentosPage() {
-  const [appointments, setAppointments] = useState(MOCK_APPOINTMENTS);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState({ total_value: "", admin_notes: "", client_notes: "" });
+  const [saving, setSaving] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchAppointments()
+      .then(setAppointments)
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
 
   const filtered = filterStatus === "all"
     ? appointments
     : appointments.filter((a) => a.status === filterStatus);
 
-  const updateStatus = (id: string, newStatus: AppointmentStatus) => {
-    setAppointments((prev) =>
-      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
-    );
+  const updateStatus = async (id: string, newStatus: AppointmentStatus) => {
+    setSaving(id);
+    try {
+      await updateAppointmentStatus(id, newStatus);
+      setAppointments((prev) =>
+        prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+      );
+    } catch {
+      // silently fail
+    }
+    setSaving(null);
   };
 
-  const startEditing = (a: MockAppointment) => {
+  const startEditing = (a: Appointment) => {
     setEditingId(a.id);
     setEditForm({
       total_value: a.total_value ? String(a.total_value) : "",
-      admin_notes: a.admin_notes,
-      client_notes: a.client_notes,
+      admin_notes: a.admin_notes || "",
+      client_notes: a.client_notes || "",
     });
   };
 
-  const saveEditing = (id: string) => {
-    setAppointments((prev) =>
-      prev.map((a) =>
-        a.id === id
-          ? {
-              ...a,
-              total_value: editForm.total_value ? Number(editForm.total_value) : null,
-              admin_notes: editForm.admin_notes,
-              client_notes: editForm.client_notes,
-            }
-          : a
-      )
-    );
+  const saveEditing = async (id: string) => {
+    setSaving(id);
+    try {
+      await updateAppointmentDetails(id, {
+        total_value: editForm.total_value ? Number(editForm.total_value) : null,
+        admin_notes: editForm.admin_notes || null,
+        client_notes: editForm.client_notes || null,
+      });
+      setAppointments((prev) =>
+        prev.map((a) =>
+          a.id === id
+            ? {
+                ...a,
+                total_value: editForm.total_value ? Number(editForm.total_value) : null,
+                admin_notes: editForm.admin_notes || null,
+                client_notes: editForm.client_notes || null,
+              }
+            : a
+        )
+      );
+    } catch {
+      // silently fail
+    }
     setEditingId(null);
+    setSaving(null);
   };
 
-  const getWhatsAppNotifyLink = (a: MockAppointment) => {
+  const getWhatsAppNotifyLink = (a: Appointment) => {
     const statusLabel = STATUS_CONFIG[a.status].label;
+    const serviceName = a.service?.name || "Serviço";
     let msg = `Olá ${a.customer_name}! Seu agendamento na TZM Multi Service:\n\n` +
-      `Serviço: ${a.service_name}\n` +
+      `Serviço: ${serviceName}\n` +
       `Status: ${STATUS_CONFIG[a.status].emoji} ${statusLabel}\n`;
     if (a.total_value) msg += `Valor: ${formatCurrency(a.total_value)}\n`;
     if (a.client_notes) msg += `\nObs: ${a.client_notes}\n`;
@@ -141,36 +88,18 @@ export default function AdminAgendamentosPage() {
     return getWhatsAppLink(a.customer_phone, msg);
   };
 
-  return (
-    <div className="min-h-screen bg-surface">
-      {/* Admin Header */}
-      <header className="bg-dark-bg border-b border-gray-800 px-4 sm:px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <h1 className="text-white text-xl font-bold">
-              TZM <span className="gradient-text">Admin</span>
-            </h1>
-          </div>
-          <nav className="flex items-center gap-6">
-            <Link href="/admin" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Dashboard
-            </Link>
-            <Link href="/admin/agendamentos" className="text-primary-orange text-sm font-medium">
-              Agendamentos
-            </Link>
-            <Link href="/admin/servicos" className="text-gray-400 hover:text-white text-sm transition-colors">
-              Serviços
-            </Link>
-            <Link href="/admin/login" className="text-gray-500 hover:text-red-400 text-sm transition-colors">
-              Sair
-            </Link>
-          </nav>
-        </div>
-      </header>
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <div className="animate-spin w-10 h-10 border-4 border-primary-orange border-t-transparent rounded-full" />
+      </div>
+    );
+  }
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-dark">Agendamentos</h2>
+  return (
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-2xl font-bold text-dark">Agendamentos</h2>
           <div className="flex items-center gap-2">
             <select
               value={filterStatus}
@@ -210,7 +139,7 @@ export default function AdminAgendamentosPage() {
                       <p className="text-sm text-gray-500">
                         {a.car_brand} {a.car_model} {a.car_year}
                         {a.car_plate && ` · ${a.car_plate}`}
-                        {" · "}{a.service_name}
+                      {" · "}{a.service?.name}
                       </p>
                       <p className="text-sm text-gray-400 mt-1">
                         📅 {formatDate(a.appointment_date)} às {a.time_slot} · ID: {a.tracking_id}
@@ -348,8 +277,9 @@ export default function AdminAgendamentosPage() {
               <p className="text-lg">Nenhum agendamento encontrado.</p>
             </div>
           )}
-        </div>
-      </main>
-    </div>
+      </div>
+    </main>
   );
 }
+
+

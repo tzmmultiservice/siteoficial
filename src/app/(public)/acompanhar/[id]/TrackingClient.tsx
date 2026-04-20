@@ -1,38 +1,10 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { COMPANY, STATUS_CONFIG } from "@/lib/constants";
 import { formatCurrency } from "@/lib/utils";
-
-type AppointmentStatus = "pending" | "confirmed" | "in_progress" | "done" | "cancelled";
-
-interface TrackingData {
-  tracking_id: string;
-  customer_name: string;
-  car_brand: string;
-  car_model: string;
-  car_year: number;
-  service_name: string;
-  appointment_date: string;
-  time_slot: string;
-  status: AppointmentStatus;
-  total_value: number | null;
-  client_notes: string | null;
-}
-
-// Mock data for static demo — will be replaced with Supabase query
-const MOCK_APPOINTMENT: TrackingData = {
-  tracking_id: "demo",
-  customer_name: "Cliente Exemplo",
-  car_brand: "Chevrolet",
-  car_model: "Onix",
-  car_year: 2022,
-  service_name: "Revisão Completa",
-  appointment_date: "2026-04-22",
-  time_slot: "10:00",
-  status: "pending",
-  total_value: null,
-  client_notes: null,
-};
+import { fetchAppointmentByTracking, subscribeToAppointment } from "@/lib/api";
+import type { Appointment, AppointmentStatus } from "@/lib/types";
 
 const TIMELINE_STEPS = [
   { status: "pending", label: "Agendado" },
@@ -47,11 +19,57 @@ function getStepIndex(status: string): number {
 }
 
 export default function TrackingClient({ id }: { id: string }) {
-  // In production: fetch appointment by tracking_id from Supabase + Realtime subscription
-  const appointment = MOCK_APPOINTMENT;
+  const [appointment, setAppointment] = useState<Appointment | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [notFound, setNotFound] = useState(false);
+
+  useEffect(() => {
+    fetchAppointmentByTracking(id)
+      .then((data) => {
+        if (!data) {
+          setNotFound(true);
+        } else {
+          setAppointment(data);
+        }
+      })
+      .catch(() => setNotFound(true))
+      .finally(() => setLoading(false));
+  }, [id]);
+
+  useEffect(() => {
+    if (!id || id === "demo") return;
+    const channel = subscribeToAppointment(id, (updated) => {
+      setAppointment(updated);
+    });
+    return () => { channel.unsubscribe(); };
+  }, [id]);
+
+  if (loading) {
+    return (
+      <section className="py-20 text-center">
+        <div className="animate-spin w-10 h-10 border-4 border-primary-orange border-t-transparent rounded-full mx-auto mb-4" />
+        <p className="text-gray-500">Carregando...</p>
+      </section>
+    );
+  }
+
+  if (notFound || !appointment) {
+    return (
+      <section className="py-20 text-center">
+        <div className="text-5xl mb-4">🔍</div>
+        <h1 className="text-2xl font-bold text-dark mb-2">Agendamento não encontrado</h1>
+        <p className="text-gray-500 mb-6">Verifique o link e tente novamente.</p>
+        <a href={COMPANY.whatsappLink} target="_blank" rel="noopener noreferrer" className="btn-primary !bg-green-500">
+          Falar no WhatsApp
+        </a>
+      </section>
+    );
+  }
+
   const currentStep = getStepIndex(appointment.status);
   const isDone = appointment.status === "done";
   const isCancelled = appointment.status === "cancelled";
+  const serviceName = appointment.service?.name || "Serviço";
 
   return (
     <>
@@ -139,7 +157,7 @@ export default function TrackingClient({ id }: { id: string }) {
               </div>
               <div>
                 <p className="text-gray-500">Serviço</p>
-                <p className="font-medium text-dark">{appointment.service_name}</p>
+                <p className="font-medium text-dark">{serviceName}</p>
               </div>
               <div>
                 <p className="text-gray-500">Data</p>

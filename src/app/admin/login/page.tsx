@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { COMPANY } from "@/lib/constants";
+import { signIn } from "@/lib/auth";
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState("");
@@ -15,14 +16,13 @@ export default function AdminLoginPage() {
     setError("");
     setLoading(true);
 
-    // In production: Supabase Auth signInWithPassword
-    // For now, simulate login
-    if (email === COMPANY.email && password === "admin123") {
-      window.location.href = "/admin";
-    } else {
+    const { error: authError } = await signIn(email, password);
+    if (authError) {
       setError("Email ou senha inválidos.");
+      setLoading(false);
+    } else {
+      window.location.href = "/admin";
     }
-    setLoading(false);
   };
 
   return (

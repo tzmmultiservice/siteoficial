@@ -1,17 +1,20 @@
 "use client";
 
 import { useState } from "react";
-import type { Metadata } from "next";
+import { createPieceInterest } from "@/lib/api";
 
 export default function PecasPage() {
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!email.includes("@")) return;
-    // In production, this will INSERT into Supabase piece_interests
-    console.log("Interesse peças:", email);
+    try {
+      await createPieceInterest(email);
+    } catch {
+      // silently continue — email saved on best-effort
+    }
     setSubmitted(true);
   };
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import {
   PLACEHOLDER_SERVICES,
@@ -10,7 +10,8 @@ import {
   COMPANY,
 } from "@/lib/constants";
 import { formatCurrency, isSaturday, isSunday } from "@/lib/utils";
-import type { BookingFormData } from "@/lib/types";
+import { fetchServices, createAppointment, fetchBookedSlots } from "@/lib/api";
+import type { BookingFormData, Service } from "@/lib/types";
 
 const STEPS = ["Seus Dados", "Seu Veículo", "Serviço", "Data e Horário", "Confirmação"];
 
@@ -23,6 +24,11 @@ function getMinDate(): string {
 export default function AgendarPage() {
   const [step, setStep] = useState(0);
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [trackingId, setTrackingId] = useState("");
+  const [services, setServices] = useState<Service[]>([]);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
   const [form, setForm] = useState<BookingFormData>({
     customer_name: "",
     customer_phone: "",
@@ -36,11 +42,29 @@ export default function AgendarPage() {
     time_slot: "",
   });
 
+  useEffect(() => {
+    fetchServices()
+      .then(setServices)
+      .catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    if (form.appointment_date) {
+      fetchBookedSlots(form.appointment_date)
+        .then(setBookedSlots)
+        .catch(() => setBookedSlots([]));
+    }
+  }, [form.appointment_date]);
+
+  const displayServices = services.length > 0
+    ? services
+    : PLACEHOLDER_SERVICES.map((s, i) => ({ ...s, id: String(i), created_at: "" }));
+
   const update = (field: keyof BookingFormData, value: string) => {
     setForm((prev) => ({ ...prev, [field]: value }));
   };
 
-  const selectedService = PLACEHOLDER_SERVICES.find((_, i) => String(i) === form.service_id);
+  const selectedService = displayServices.find((s) => s.id === form.service_id);
 
   const timeSlots = form.appointment_date
     ? isSaturday(form.appointment_date)
@@ -63,10 +87,23 @@ export default function AgendarPage() {
     }
   };
 
-  const handleSubmit = () => {
-    // In production, this will INSERT into Supabase
-    console.log("Agendamento:", form);
-    setSubmitted(true);
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    setError("");
+    try {
+      const appointment = await createAppointment(form);
+      setTrackingId(appointment.tracking_id);
+      setSubmitted(true);
+    } catch (err: unknown) {
+      if (err instanceof Error && err.message === "SLOT_TAKEN") {
+        setError("Este horário já foi reservado. Por favor, escolha outro.");
+        setStep(3);
+      } else {
+        setError("Erro ao agendar. Tente novamente ou entre em contato pelo WhatsApp.");
+      }
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -93,15 +130,20 @@ export default function AgendarPage() {
               <li><span className="font-medium text-dark">Horário:</span> {form.time_slot}</li>
             </ul>
           </div>
-          <p className="text-sm text-gray-400 mb-6">
-            Você receberá um link para acompanhar o status do seu serviço em tempo real.
-          </p>
+          {trackingId && (
+            <div className="bg-orange-50 border border-orange-200 rounded-xl p-4 mb-6">
+              <p className="text-sm font-medium text-dark mb-1">Acompanhe seu serviço:</p>
+              <Link href={`/acompanhar/${trackingId}`} className="text-primary-orange font-bold hover:underline">
+                Abrir página de acompanhamento →
+              </Link>
+            </div>
+          )}
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link href="/" className="btn-secondary text-sm">
               Voltar ao Início
             </Link>
             <a
-              href={`${COMPANY.whatsappLink}`}
+              href={COMPANY.whatsappLink}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-primary text-sm !bg-green-500 hover:!bg-green-600"
@@ -130,16 +172,13 @@ export default function AgendarPage() {
 
       <section className="py-12 bg-surface">
         <div className="max-w-2xl mx-auto px-4">
-          {/* Step Indicator */}
           <div className="flex items-center justify-between mb-10">
             {STEPS.map((label, i) => (
               <div key={label} className="flex items-center">
                 <div className="flex flex-col items-center">
                   <div
                     className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
-                      i <= step
-                        ? "gradient-brand text-white"
-                        : "bg-gray-200 text-gray-400"
+                      i <= step ? "gradient-brand text-white" : "bg-gray-200 text-gray-400"
                     }`}
                   >
                     {i < step ? (
@@ -153,150 +192,67 @@ export default function AgendarPage() {
                   <span className="text-xs mt-1 text-gray-500 hidden sm:block">{label}</span>
                 </div>
                 {i < STEPS.length - 1 && (
-                  <div
-                    className={`w-8 sm:w-16 h-0.5 mx-1 ${
-                      i < step ? "bg-primary-orange" : "bg-gray-200"
-                    }`}
-                  />
+                  <div className={`w-8 sm:w-16 h-0.5 mx-1 ${i < step ? "bg-primary-orange" : "bg-gray-200"}`} />
                 )}
               </div>
             ))}
           </div>
 
           <div className="bg-white rounded-xl p-6 sm:p-8 shadow-sm">
-            {/* Step 0: Dados pessoais */}
             {step === 0 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-dark mb-4">Seus Dados</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Nome Completo *
-                  </label>
-                  <input
-                    type="text"
-                    value={form.customer_name}
-                    onChange={(e) => update("customer_name", e.target.value)}
-                    placeholder="Seu nome completo"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Nome Completo *</label>
+                  <input type="text" value={form.customer_name} onChange={(e) => update("customer_name", e.target.value)} placeholder="Seu nome completo" className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    WhatsApp *
-                  </label>
-                  <input
-                    type="tel"
-                    value={form.customer_phone}
-                    onChange={(e) => update("customer_phone", e.target.value)}
-                    placeholder="(74) 99999-9999"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">WhatsApp *</label>
+                  <input type="tel" value={form.customer_phone} onChange={(e) => update("customer_phone", e.target.value)} placeholder="(74) 99999-9999" className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Email <span className="text-gray-400">(opcional)</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={form.customer_email}
-                    onChange={(e) => update("customer_email", e.target.value)}
-                    placeholder="seu@email.com"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Email <span className="text-gray-400">(opcional)</span></label>
+                  <input type="email" value={form.customer_email} onChange={(e) => update("customer_email", e.target.value)} placeholder="seu@email.com" className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                 </div>
               </div>
             )}
 
-            {/* Step 1: Dados do veículo */}
             {step === 1 && (
               <div className="space-y-4">
                 <h2 className="text-xl font-bold text-dark mb-4">Seu Veículo</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Marca *
-                  </label>
-                  <select
-                    value={form.car_brand}
-                    onChange={(e) => update("car_brand", e.target.value)}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all bg-white"
-                  >
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Marca *</label>
+                  <select value={form.car_brand} onChange={(e) => update("car_brand", e.target.value)} className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all bg-white">
                     <option value="">Selecione a marca</option>
-                    {CAR_BRANDS.map((brand) => (
-                      <option key={brand} value={brand}>{brand}</option>
-                    ))}
+                    {CAR_BRANDS.map((brand) => (<option key={brand} value={brand}>{brand}</option>))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Modelo *
-                  </label>
-                  <input
-                    type="text"
-                    value={form.car_model}
-                    onChange={(e) => update("car_model", e.target.value)}
-                    placeholder="Ex: Onix, Gol, HB20..."
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Modelo *</label>
+                  <input type="text" value={form.car_model} onChange={(e) => update("car_model", e.target.value)} placeholder="Ex: Onix, Gol, HB20..." className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Ano *
-                    </label>
-                    <input
-                      type="number"
-                      value={form.car_year}
-                      onChange={(e) => update("car_year", e.target.value.slice(0, 4))}
-                      placeholder="2020"
-                      min="1990"
-                      max={new Date().getFullYear() + 1}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Ano *</label>
+                    <input type="text" value={form.car_year} onChange={(e) => update("car_year", e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="2024" className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Placa <span className="text-gray-400">(opc.)</span>
-                    </label>
-                    <input
-                      type="text"
-                      value={form.car_plate}
-                      onChange={(e) => update("car_plate", e.target.value.toUpperCase().slice(0, 7))}
-                      placeholder="ABC1D23"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                    />
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Placa <span className="text-gray-400">(opc.)</span></label>
+                    <input type="text" value={form.car_plate} onChange={(e) => update("car_plate", e.target.value.toUpperCase().slice(0, 7))} placeholder="ABC1D23" className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Step 2: Escolha do serviço */}
             {step === 2 && (
               <div>
                 <h2 className="text-xl font-bold text-dark mb-4">Escolha o Serviço</h2>
                 <div className="space-y-3">
-                  {PLACEHOLDER_SERVICES.map((service, i) => (
-                    <label
-                      key={service.name}
-                      className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                        form.service_id === String(i)
-                          ? "border-primary-orange bg-orange-50"
-                          : "border-gray-200 hover:border-gray-300"
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="service"
-                        value={String(i)}
-                        checked={form.service_id === String(i)}
-                        onChange={(e) => update("service_id", e.target.value)}
-                        className="sr-only"
-                      />
-                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        form.service_id === String(i) ? "border-primary-orange" : "border-gray-300"
-                      }`}>
-                        {form.service_id === String(i) && (
-                          <div className="w-3 h-3 rounded-full gradient-brand" />
-                        )}
+                  {displayServices.map((service) => (
+                    <label key={service.id} className={`flex items-center gap-4 p-4 rounded-lg border-2 cursor-pointer transition-all ${form.service_id === service.id ? "border-primary-orange bg-orange-50" : "border-gray-200 hover:border-gray-300"}`}>
+                      <input type="radio" name="service" value={service.id} checked={form.service_id === service.id} onChange={(e) => update("service_id", e.target.value)} className="sr-only" />
+                      <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${form.service_id === service.id ? "border-primary-orange" : "border-gray-300"}`}>
+                        {form.service_id === service.id && <div className="w-3 h-3 rounded-full gradient-brand" />}
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-dark">{service.name}</p>
@@ -312,56 +268,32 @@ export default function AgendarPage() {
               </div>
             )}
 
-            {/* Step 3: Data e horário */}
             {step === 3 && (
               <div className="space-y-6">
                 <h2 className="text-xl font-bold text-dark mb-4">Data e Horário</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Data *
-                  </label>
-                  <input
-                    type="date"
-                    value={form.appointment_date}
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      if (val && isSunday(val)) return;
-                      update("appointment_date", val);
-                      update("time_slot", "");
-                    }}
-                    min={getMinDate()}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
-                  />
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Data *</label>
+                  <input type="date" value={form.appointment_date} onChange={(e) => { const val = e.target.value; if (val && isSunday(val)) return; update("appointment_date", val); update("time_slot", ""); }} min={getMinDate()} className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all" />
                   <p className="text-xs text-gray-400 mt-1">Não atendemos aos domingos.</p>
                 </div>
-
                 {form.appointment_date && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Horário Disponível *
-                    </label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Horário Disponível *</label>
                     <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
-                      {timeSlots.map((slot) => (
-                        <button
-                          key={slot}
-                          type="button"
-                          onClick={() => update("time_slot", slot)}
-                          className={`py-3 px-2 rounded-lg text-sm font-medium transition-all ${
-                            form.time_slot === slot
-                              ? "gradient-brand text-white"
-                              : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-                          }`}
-                        >
-                          {slot}
-                        </button>
-                      ))}
+                      {timeSlots.map((slot) => {
+                        const taken = bookedSlots.includes(slot);
+                        return (
+                          <button key={slot} type="button" disabled={taken} onClick={() => update("time_slot", slot)} className={`py-3 px-2 rounded-lg text-sm font-medium transition-all ${taken ? "bg-red-50 text-red-300 cursor-not-allowed line-through" : form.time_slot === slot ? "gradient-brand text-white" : "bg-gray-100 text-gray-700 hover:bg-gray-200"}`}>
+                            {slot}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
                 )}
               </div>
             )}
 
-            {/* Step 4: Confirmação */}
             {step === 4 && (
               <div>
                 <h2 className="text-xl font-bold text-dark mb-6">Confirme seu Agendamento</h2>
@@ -380,55 +312,30 @@ export default function AgendarPage() {
                   <div className="bg-surface rounded-lg p-4">
                     <h3 className="font-semibold text-sm text-gray-500 mb-2">SERVIÇO</h3>
                     <p className="text-dark font-medium">{selectedService?.name}</p>
-                    <p className="text-primary-orange font-bold">
-                      A partir de {selectedService && formatCurrency(selectedService.price_estimate)}
-                    </p>
+                    <p className="text-primary-orange font-bold">A partir de {selectedService && formatCurrency(selectedService.price_estimate)}</p>
                   </div>
                   <div className="bg-surface rounded-lg p-4">
                     <h3 className="font-semibold text-sm text-gray-500 mb-2">DATA E HORÁRIO</h3>
-                    <p className="text-dark font-medium">
-                      {new Date(form.appointment_date + "T12:00:00").toLocaleDateString("pt-BR", {
-                        weekday: "long",
-                        day: "2-digit",
-                        month: "long",
-                        year: "numeric",
-                      })}
-                    </p>
+                    <p className="text-dark font-medium">{new Date(form.appointment_date + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}</p>
                     <p className="text-primary-orange font-bold text-lg">{form.time_slot}</p>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Navigation */}
             <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
               {step > 0 ? (
-                <button
-                  onClick={() => setStep(step - 1)}
-                  className="text-gray-500 hover:text-gray-700 font-medium transition-colors"
-                >
-                  ← Voltar
-                </button>
+                <button onClick={() => setStep(step - 1)} className="text-gray-500 hover:text-gray-700 font-medium transition-colors">← Voltar</button>
               ) : (
-                <Link href="/" className="text-gray-500 hover:text-gray-700 font-medium transition-colors">
-                  ← Início
-                </Link>
+                <Link href="/" className="text-gray-500 hover:text-gray-700 font-medium transition-colors">← Início</Link>
               )}
-
               {step < 4 ? (
-                <button
-                  onClick={() => setStep(step + 1)}
-                  disabled={!canNext()}
-                  className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none"
-                >
-                  Próximo →
-                </button>
+                <button onClick={() => setStep(step + 1)} disabled={!canNext()} className="btn-primary disabled:opacity-40 disabled:cursor-not-allowed disabled:transform-none">Próximo →</button>
               ) : (
-                <button onClick={handleSubmit} className="btn-primary !bg-green-500 hover:!bg-green-600">
-                  ✓ Confirmar Agendamento
-                </button>
+                <button onClick={handleSubmit} disabled={submitting} className="btn-primary !bg-green-500 hover:!bg-green-600 disabled:opacity-50">{submitting ? "Enviando..." : "✓ Confirmar Agendamento"}</button>
               )}
             </div>
+            {error && <p className="text-red-500 text-sm mt-3 text-center">{error}</p>}
           </div>
         </div>
       </section>

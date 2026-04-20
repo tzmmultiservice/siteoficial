@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Header from "@/components/layout/Header";
@@ -30,6 +30,19 @@ export const metadata: Metadata = {
     locale: "pt_BR",
     type: "website",
   },
+  manifest: "/manifest.json",
+  icons: {
+    icon: [
+      { url: "/images/logo-dark.jpeg", type: "image/jpeg" },
+      { url: "/images/logo-light.jpeg", type: "image/jpeg" },
+    ],
+    shortcut: "/images/logo-dark.jpeg",
+    apple: "/images/logo-light.jpeg",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#E65C00",
 };
 
 export default function RootLayout({
@@ -43,11 +56,8 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <head>
-        <meta name="theme-color" content="#E65C00" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="apple-touch-icon" href="/images/icon-192.png" />
       </head>
       <body className="min-h-full flex flex-col">
         {children}

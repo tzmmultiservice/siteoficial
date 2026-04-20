@@ -20,45 +20,35 @@ export default function PecasPage() {
 
   return (
     <>
-      <section className="pt-32 pb-16 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(230,92,0,0.06)_0%,_transparent_60%)]" />
-        <div className="relative max-w-3xl mx-auto px-4 text-center">
-          <span className="inline-block bg-primary-orange/15 text-primary-gold text-sm font-semibold px-5 py-1.5 rounded-full mb-6 tracking-wider uppercase">
-            Em Breve
+      <section className="relative pt-32 pb-20 bg-dark-bg overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=2200&q=80"
+          alt="Peças automotivas"
+          className="absolute inset-0 h-full w-full object-cover"
+          loading="eager"
+        />
+        <div className="absolute inset-0 bg-black/75" />
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,_rgba(230,92,0,0.35),_transparent_45%)]" />
+
+        <div className="relative max-w-5xl mx-auto px-4 text-center">
+          <span className="inline-flex rounded-full border border-primary-orange/40 bg-primary-orange/12 px-4 py-2 text-xs font-semibold tracking-widest uppercase text-primary-gold mb-5">
+            Lançamento em preparação
           </span>
-          <h1 className="text-4xl sm:text-5xl font-bold text-white mb-4">
-            Catálogo de <span className="gradient-text">Peças</span>
-          </h1>
-          <p className="text-gray-500 text-lg">
-            Estamos montando nosso catálogo online com as melhores peças automotivas.
+          <h1 className="text-4xl sm:text-6xl font-black text-white mb-4">Catálogo de peças premium</h1>
+          <p className="text-gray-200 text-lg max-w-3xl mx-auto">
+            Em breve você poderá comprar peças selecionadas com rastreabilidade e orientação técnica.
           </p>
         </div>
       </section>
 
-      <section className="pb-20">
-        <div className="max-w-lg mx-auto px-4 text-center">
-          <div className="glass-card rounded-2xl p-8">
-            <div className="w-20 h-20 rounded-2xl bg-primary-orange/10 flex items-center justify-center mx-auto mb-6 ring-1 ring-primary-orange/20">
-              <svg className="w-10 h-10 text-primary-orange" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-              </svg>
-            </div>
-
-            {submitted ? (
+      <section className="py-16 sm:py-24 bg-dark-bg">
+        <div className="max-w-3xl mx-auto px-4">
+          <div className="glass-card rounded-2xl p-8 sm:p-10 border border-dark-border-light text-center">
+            {!submitted ? (
               <>
-                <h2 className="text-2xl font-bold text-white mb-3">Obrigado!</h2>
-                <p className="text-gray-500">
-                  Você será avisado assim que nosso catálogo de peças estiver disponível.
-                </p>
-              </>
-            ) : (
-              <>
-                <h2 className="text-2xl font-bold text-white mb-3">
-                  Seja o Primeiro a Saber
-                </h2>
-                <p className="text-gray-500 mb-6">
-                  Deixe seu email e avisaremos assim que o catálogo de peças
-                  estiver disponível para compra online.
+                <h2 className="text-3xl font-bold text-white mb-3">Entre na lista VIP</h2>
+                <p className="text-gray-300 mb-7">
+                  Receba em primeira mão o acesso ao catálogo de peças com ofertas exclusivas.
                 </p>
                 <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
                   <input
@@ -68,27 +58,22 @@ export default function PecasPage() {
                     placeholder="seu@email.com"
                     required
                     className="input-dark flex-1"
+                    title="Seu email"
+                    aria-label="Seu email"
                   />
                   <button type="submit" className="btn-primary whitespace-nowrap">
-                    Me Avise
+                    Quero acesso
                   </button>
                 </form>
               </>
+            ) : (
+              <>
+                <h2 className="text-3xl font-bold text-white mb-3">Cadastro confirmado</h2>
+                <p className="text-gray-200">
+                  Assim que o catálogo estiver no ar, você receberá a notificação no email cadastrado.
+                </p>
+              </>
             )}
-          </div>
-
-          <div className="mt-12 grid grid-cols-1 sm:grid-cols-3 gap-5">
-            {[
-              { icon: "🔧", title: "Peças Originais", desc: "Trabalharemos apenas com peças de qualidade comprovada." },
-              { icon: "🚚", title: "Entrega Rápida", desc: "Retire na loja ou receba em casa com agilidade." },
-              { icon: "💰", title: "Preços Justos", desc: "Os melhores preços da região para peças automotivas." },
-            ].map((item) => (
-              <div key={item.title} className="glass-card rounded-2xl p-6 text-center">
-                <span className="text-3xl mb-3 block">{item.icon}</span>
-                <h3 className="font-bold text-white mb-1">{item.title}</h3>
-                <p className="text-gray-500 text-sm">{item.desc}</p>
-              </div>
-            ))}
           </div>
         </div>
       </section>

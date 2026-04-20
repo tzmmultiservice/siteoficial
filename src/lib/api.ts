@@ -94,7 +94,14 @@ export async function updateAppointmentStatus(id: string, status: AppointmentSta
 
 export async function updateAppointmentDetails(
   id: string,
-  updates: { total_value?: number | null; admin_notes?: string | null; client_notes?: string | null }
+  updates: {
+    total_value?: number | null;
+    admin_notes?: string | null;
+    client_notes?: string | null;
+    responsible_mechanic?: string | null;
+    yard_name?: string | null;
+    progress_percent?: number;
+  }
 ) {
   const { error } = await supabase
     .from("appointments")
@@ -145,6 +152,92 @@ export async function fetchDashboardStats() {
     done: done.count ?? 0,
     today: todayCount.count ?? 0,
     this_week: weekCount.count ?? 0,
+  };
+}
+
+export interface OwnerYardOverview {
+  yard_name: string;
+  total: number;
+  waiting: number;
+  active: number;
+  done: number;
+  cancelled: number;
+}
+
+export interface OwnerOverview {
+  total_cars: number;
+  active_services: number;
+  waiting_services: number;
+  completed_this_week: number;
+  avg_progress: number;
+  monthly_revenue: number;
+  yards: OwnerYardOverview[];
+}
+
+export async function fetchOwnerOverview(): Promise<OwnerOverview> {
+  const today = new Date();
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+  const weekStartStr = weekStart.toISOString().split("T")[0];
+
+  const monthStart = new Date(today.getFullYear(), today.getMonth(), 1)
+    .toISOString()
+    .split("T")[0];
+
+  const { data, error } = await supabase
+    .from("appointments")
+    .select("status, yard_name, progress_percent, total_value, appointment_date");
+
+  if (error) throw error;
+
+  const rows = data ?? [];
+  const totalCars = rows.length;
+  const waitingServices = rows.filter((a) => a.status === "pending" || a.status === "confirmed").length;
+  const activeServices = rows.filter((a) => a.status === "in_progress").length;
+  const completedThisWeek = rows.filter(
+    (a) => a.status === "done" && a.appointment_date >= weekStartStr
+  ).length;
+
+  const monthRevenue = rows.reduce((acc, row) => {
+    if (row.status === "done" && row.appointment_date >= monthStart && row.total_value) {
+      return acc + Number(row.total_value);
+    }
+    return acc;
+  }, 0);
+
+  const avgProgress = totalCars
+    ? Math.round(rows.reduce((acc, row) => acc + Number(row.progress_percent || 0), 0) / totalCars)
+    : 0;
+
+  const yardMap = new Map<string, OwnerYardOverview>();
+  for (const row of rows) {
+    const yard = row.yard_name || "Pátio Principal";
+    if (!yardMap.has(yard)) {
+      yardMap.set(yard, {
+        yard_name: yard,
+        total: 0,
+        waiting: 0,
+        active: 0,
+        done: 0,
+        cancelled: 0,
+      });
+    }
+    const current = yardMap.get(yard)!;
+    current.total += 1;
+    if (row.status === "pending" || row.status === "confirmed") current.waiting += 1;
+    if (row.status === "in_progress") current.active += 1;
+    if (row.status === "done") current.done += 1;
+    if (row.status === "cancelled") current.cancelled += 1;
+  }
+
+  return {
+    total_cars: totalCars,
+    active_services: activeServices,
+    waiting_services: waitingServices,
+    completed_this_week: completedThisWeek,
+    avg_progress: avgProgress,
+    monthly_revenue: monthRevenue,
+    yards: Array.from(yardMap.values()).sort((a, b) => b.total - a.total),
   };
 }
 

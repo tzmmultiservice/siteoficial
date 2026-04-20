@@ -34,16 +34,38 @@ CREATE TABLE IF NOT EXISTS appointments (
   total_value NUMERIC(10,2),
   admin_notes TEXT,
   client_notes TEXT,
+  responsible_mechanic TEXT,
+  yard_name TEXT NOT NULL DEFAULT 'Pátio Principal',
+  progress_percent INTEGER NOT NULL DEFAULT 0 CHECK (progress_percent >= 0 AND progress_percent <= 100),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   -- Anti-double-booking: máximo 1 agendamento por horário+data (exceto cancelados)
   CONSTRAINT unique_slot UNIQUE (appointment_date, time_slot)
 );
 
+-- Backfill para bancos já existentes
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS responsible_mechanic TEXT;
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS yard_name TEXT NOT NULL DEFAULT 'Pátio Principal';
+ALTER TABLE appointments ADD COLUMN IF NOT EXISTS progress_percent INTEGER NOT NULL DEFAULT 0;
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1
+    FROM pg_constraint
+    WHERE conname = 'appointments_progress_percent_check'
+  ) THEN
+    ALTER TABLE appointments
+      ADD CONSTRAINT appointments_progress_percent_check
+      CHECK (progress_percent >= 0 AND progress_percent <= 100);
+  END IF;
+END $$;
+
 -- Índices para consultas frequentes
 CREATE INDEX IF NOT EXISTS idx_appointments_status ON appointments(status);
 CREATE INDEX IF NOT EXISTS idx_appointments_date ON appointments(appointment_date);
 CREATE INDEX IF NOT EXISTS idx_appointments_tracking ON appointments(tracking_id);
+CREATE INDEX IF NOT EXISTS idx_appointments_yard ON appointments(yard_name);
+CREATE INDEX IF NOT EXISTS idx_appointments_mechanic ON appointments(responsible_mechanic);
 
 -- 3. Tabela de interesses em peças
 CREATE TABLE IF NOT EXISTS piece_interests (

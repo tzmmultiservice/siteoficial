@@ -97,7 +97,7 @@ export default function AgendarPage() {
 
   if (submitted) {
     return (
-      <section className="pt-28 pb-20">
+      <section className="pt-28 pb-20 bg-dark-bg">
         <div className="max-w-lg mx-auto px-4 text-center">
           <div className="w-20 h-20 rounded-full bg-green-500/15 flex items-center justify-center mx-auto mb-6 ring-1 ring-green-500/30">
             <svg className="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -105,23 +105,23 @@ export default function AgendarPage() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold text-white mb-4">Agendamento Enviado!</h1>
-          <p className="text-gray-500 mb-6">
+          <p className="text-gray-300 mb-6">
             Seu agendamento foi recebido. Entraremos em contato pelo WhatsApp para confirmar.
           </p>
           <div className="glass-card rounded-2xl p-6 text-left mb-8">
             <h3 className="font-semibold text-white mb-3">Resumo:</h3>
-            <ul className="space-y-2 text-sm text-gray-400">
-              <li><span className="font-medium text-gray-300">Nome:</span> {form.customer_name}</li>
-              <li><span className="font-medium text-gray-300">WhatsApp:</span> {form.customer_phone}</li>
-              <li><span className="font-medium text-gray-300">Veículo:</span> {form.car_brand} {form.car_model} {form.car_year}</li>
-              <li><span className="font-medium text-gray-300">Serviço:</span> {selectedService?.name}</li>
-              <li><span className="font-medium text-gray-300">Data:</span> {new Date(form.appointment_date + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}</li>
-              <li><span className="font-medium text-gray-300">Horário:</span> {form.time_slot}</li>
+            <ul className="space-y-2 text-sm text-gray-200">
+              <li><span className="font-medium text-white">Nome:</span> {form.customer_name}</li>
+              <li><span className="font-medium text-white">WhatsApp:</span> {form.customer_phone}</li>
+              <li><span className="font-medium text-white">Veículo:</span> {form.car_brand} {form.car_model} {form.car_year}</li>
+              <li><span className="font-medium text-white">Serviço:</span> {selectedService?.name}</li>
+              <li><span className="font-medium text-white">Data:</span> {new Date(form.appointment_date + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" })}</li>
+              <li><span className="font-medium text-white">Horário:</span> {form.time_slot}</li>
             </ul>
           </div>
           {trackingId && (
             <div className="glass-card rounded-2xl p-5 mb-6 border-primary-orange/20">
-              <p className="text-sm font-medium text-gray-400 mb-1">Acompanhe seu serviço:</p>
+              <p className="text-sm font-medium text-gray-300 mb-1">Acompanhe seu serviço:</p>
               <Link href={`/acompanhar/${trackingId}`} className="text-primary-gold font-bold hover:text-primary-orange transition-colors">
                 Abrir página de acompanhamento →
               </Link>
@@ -141,17 +141,18 @@ export default function AgendarPage() {
 
   return (
     <>
-      <section className="pt-32 pb-8 relative">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(230,92,0,0.06)_0%,_transparent_60%)]" />
+      <section className="pt-32 pb-8 relative bg-dark-bg overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(230,92,0,0.12)_0%,_transparent_60%)]" />
+        <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(0,0,0,0.5),rgba(0,0,0,0.1)_40%,rgba(0,0,0,0.55))]" />
         <div className="relative max-w-3xl mx-auto px-4 text-center">
           <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
             Agendar <span className="gradient-text">Serviço</span>
           </h1>
-          <p className="text-gray-500">Preencha os dados abaixo para agendar seu serviço.</p>
+          <p className="text-gray-300">Preencha os dados abaixo para agendar seu serviço.</p>
         </div>
       </section>
 
-      <section className="py-10">
+      <section className="py-10 bg-dark-bg min-h-[70vh]">
         <div className="max-w-2xl mx-auto px-4">
           {/* Stepper */}
           <div className="flex items-center justify-between mb-10">
@@ -165,7 +166,7 @@ export default function AgendarPage() {
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
                     ) : (i + 1)}
                   </div>
-                  <span className="text-xs mt-1.5 text-gray-600 hidden sm:block">{label}</span>
+                  <span className="text-xs mt-1.5 text-gray-400 hidden sm:block">{label}</span>
                 </div>
                 {i < STEPS.length - 1 && (
                   <div className={`w-8 sm:w-16 h-0.5 mx-1 transition-colors duration-300 ${i < step ? "bg-primary-orange" : "bg-dark-border"}`} />
@@ -175,20 +176,20 @@ export default function AgendarPage() {
           </div>
 
           {/* Form Card */}
-          <div className="glass-card rounded-2xl p-6 sm:p-8">
+          <div className="glass-card rounded-2xl p-6 sm:p-8 border border-dark-border-light shadow-[0_30px_80px_rgba(0,0,0,0.55)]">
             {step === 0 && (
               <div className="space-y-5">
                 <h2 className="text-xl font-bold text-white mb-4">Seus Dados</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Nome Completo *</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Nome Completo *</label>
                   <input type="text" value={form.customer_name} onChange={(e) => update("customer_name", e.target.value)} placeholder="Seu nome completo" className="input-dark" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">WhatsApp *</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">WhatsApp *</label>
                   <input type="tel" value={form.customer_phone} onChange={(e) => update("customer_phone", e.target.value)} placeholder="(74) 99999-9999" className="input-dark" />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Email <span className="text-gray-600">(opcional)</span></label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Email <span className="text-gray-500">(opcional)</span></label>
                   <input type="email" value={form.customer_email} onChange={(e) => update("customer_email", e.target.value)} placeholder="seu@email.com" className="input-dark" />
                 </div>
               </div>
@@ -198,23 +199,23 @@ export default function AgendarPage() {
               <div className="space-y-5">
                 <h2 className="text-xl font-bold text-white mb-4">Seu Veículo</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Marca *</label>
-                  <select value={form.car_brand} onChange={(e) => update("car_brand", e.target.value)} className="input-dark">
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Marca *</label>
+                  <select value={form.car_brand} onChange={(e) => update("car_brand", e.target.value)} className="input-dark" title="Marca do veículo" aria-label="Marca do veículo">
                     <option value="">Selecione a marca</option>
                     {CAR_BRANDS.map((brand) => (<option key={brand} value={brand}>{brand}</option>))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Modelo *</label>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Modelo *</label>
                   <input type="text" value={form.car_model} onChange={(e) => update("car_model", e.target.value)} placeholder="Ex: Onix, Gol, HB20..." className="input-dark" />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1.5">Ano *</label>
+                    <label className="block text-sm font-medium text-gray-200 mb-1.5">Ano *</label>
                     <input type="text" value={form.car_year} onChange={(e) => update("car_year", e.target.value.replace(/\D/g, "").slice(0, 4))} placeholder="2024" className="input-dark" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-1.5">Placa <span className="text-gray-600">(opc.)</span></label>
+                    <label className="block text-sm font-medium text-gray-200 mb-1.5">Placa <span className="text-gray-500">(opc.)</span></label>
                     <input type="text" value={form.car_plate} onChange={(e) => update("car_plate", e.target.value.toUpperCase().slice(0, 7))} placeholder="ABC1D23" className="input-dark" />
                   </div>
                 </div>
@@ -239,11 +240,11 @@ export default function AgendarPage() {
                       </div>
                       <div className="flex-1">
                         <p className="font-semibold text-white">{service.name}</p>
-                        <p className="text-xs text-gray-500">{service.description}</p>
+                        <p className="text-xs text-gray-300">{service.description}</p>
                       </div>
                       <div className="text-right shrink-0">
                         <p className="font-bold text-primary-gold">{formatCurrency(service.price_estimate)}</p>
-                        <p className="text-xs text-gray-600">~{service.duration_minutes}min</p>
+                        <p className="text-xs text-gray-400">~{service.duration_minutes}min</p>
                       </div>
                     </label>
                   ))}
@@ -255,13 +256,13 @@ export default function AgendarPage() {
               <div className="space-y-6">
                 <h2 className="text-xl font-bold text-white mb-4">Data e Horário</h2>
                 <div>
-                  <label className="block text-sm font-medium text-gray-400 mb-1.5">Data *</label>
-                  <input type="date" value={form.appointment_date} onChange={(e) => { const val = e.target.value; if (val && isSunday(val)) return; update("appointment_date", val); update("time_slot", ""); }} min={getMinDate()} className="input-dark" />
-                  <p className="text-xs text-gray-600 mt-1.5">Não atendemos aos domingos.</p>
+                  <label className="block text-sm font-medium text-gray-200 mb-1.5">Data *</label>
+                  <input type="date" value={form.appointment_date} onChange={(e) => { const val = e.target.value; if (val && isSunday(val)) return; update("appointment_date", val); update("time_slot", ""); }} min={getMinDate()} className="input-dark" title="Data do agendamento" aria-label="Data do agendamento" />
+                  <p className="text-xs text-gray-400 mt-1.5">Não atendemos aos domingos.</p>
                 </div>
                 {form.appointment_date && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-400 mb-2">Horário Disponível *</label>
+                    <label className="block text-sm font-medium text-gray-200 mb-2">Horário Disponível *</label>
                     <div className="grid grid-cols-3 sm:grid-cols-5 gap-2">
                       {timeSlots.map((slot) => {
                         const taken = bookedSlots.includes(slot);
@@ -271,7 +272,7 @@ export default function AgendarPage() {
                               ? "bg-red-500/10 text-red-400/40 cursor-not-allowed line-through border border-red-500/10"
                               : form.time_slot === slot
                               ? "gradient-brand text-white shadow-[0_0_15px_rgba(230,92,0,0.3)]"
-                              : "bg-dark-card border border-dark-border-light text-gray-400 hover:border-primary-orange/30 hover:text-white"
+                                : "bg-dark-card border border-dark-border-light text-gray-300 hover:border-primary-orange/30 hover:text-white"
                           }`}>
                             {slot}
                           </button>
@@ -294,9 +295,9 @@ export default function AgendarPage() {
                     { title: "DATA E HORÁRIO", lines: [form.appointment_date ? new Date(form.appointment_date + "T12:00:00").toLocaleDateString("pt-BR", { weekday: "long", day: "2-digit", month: "long", year: "numeric" }) : "", form.time_slot] },
                   ].map((block) => (
                     <div key={block.title} className="bg-dark-card/80 rounded-xl p-4 border border-dark-border">
-                      <h3 className="font-semibold text-xs text-gray-600 mb-2 tracking-wider">{block.title}</h3>
+                      <h3 className="font-semibold text-xs text-gray-400 mb-2 tracking-wider">{block.title}</h3>
                       {block.lines.map((line, i) => (
-                        <p key={i} className={i === 0 ? "text-white font-medium" : "text-gray-400 text-sm"}>{line}</p>
+                        <p key={i} className={i === 0 ? "text-white font-medium" : "text-gray-300 text-sm"}>{line}</p>
                       ))}
                     </div>
                   ))}

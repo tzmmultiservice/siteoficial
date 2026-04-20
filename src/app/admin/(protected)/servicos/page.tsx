@@ -66,7 +66,16 @@ export default function AdminServicosPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <h2 className="text-2xl font-bold text-white mb-6">Gerenciar Serviços</h2>
+      <section className="relative overflow-hidden rounded-2xl border border-dark-border-light bg-black/25 p-6 sm:p-8 mb-6">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_15%,_rgba(230,92,0,0.2),_transparent_42%)]" />
+        <div className="relative">
+          <p className="text-primary-gold text-xs font-semibold tracking-widest uppercase mb-2">Cadastro operacional</p>
+          <h2 className="text-3xl font-black text-white mb-2">Gerenciar Serviços</h2>
+          <p className="text-gray-300 text-sm">
+            Atualize preço, descrição e disponibilidade do catálogo exibido no site e no agendamento.
+          </p>
+        </div>
+      </section>
 
       <div className="space-y-4">
         {services.map((service) => {
@@ -74,7 +83,7 @@ export default function AdminServicosPage() {
           return (
             <div
               key={service.id}
-              className={`glass-card rounded-xl p-5 transition-opacity ${
+              className={`glass-card rounded-xl p-5 border border-dark-border-light transition-opacity ${
                 !service.active ? "opacity-60" : ""
               }`}
             >
@@ -88,6 +97,8 @@ export default function AdminServicosPage() {
                         value={editForm.name}
                         onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
                         className="input-dark text-sm"
+                        title="Nome"
+                        aria-label="Nome"
                       />
                     </div>
                     <div>
@@ -97,6 +108,8 @@ export default function AdminServicosPage() {
                         value={editForm.price_estimate}
                         onChange={(e) => setEditForm((p) => ({ ...p, price_estimate: Number(e.target.value) }))}
                         className="input-dark text-sm"
+                        title="Preço estimado"
+                        aria-label="Preço estimado"
                       />
                     </div>
                   </div>
@@ -107,6 +120,8 @@ export default function AdminServicosPage() {
                       onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
                       rows={2}
                       className="input-dark text-sm resize-none"
+                      title="Descrição"
+                      aria-label="Descrição"
                     />
                   </div>
                   <div className="w-48">
@@ -116,6 +131,8 @@ export default function AdminServicosPage() {
                       value={editForm.duration_minutes}
                       onChange={(e) => setEditForm((p) => ({ ...p, duration_minutes: Number(e.target.value) }))}
                       className="input-dark text-sm"
+                      title="Duração"
+                      aria-label="Duração"
                     />
                   </div>
                   <div className="flex gap-2 pt-2">

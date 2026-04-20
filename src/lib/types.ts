@@ -5,6 +5,8 @@ export type AppointmentStatus =
   | "done"
   | "cancelled";
 
+export type AdminRole = "mechanic" | "owner";
+
 export interface Service {
   id: string;
   name: string;
@@ -33,6 +35,9 @@ export interface Appointment {
   total_value: number | null;
   admin_notes: string | null;
   client_notes: string | null;
+  responsible_mechanic: string | null;
+  yard_name: string | null;
+  progress_percent: number;
   tracking_id: string;
   created_at: string;
   updated_at: string;

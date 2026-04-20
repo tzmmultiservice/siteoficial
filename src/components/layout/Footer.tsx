@@ -83,12 +83,26 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-gray-700 mt-8 pt-6 text-center text-xs text-gray-500">
-          &copy; {new Date().getFullYear()} {COMPANY.fullName}. Todos os direitos reservados.
-          <span className="mx-1">·</span>
-          <Link href="/admin/login" className="hover:text-gray-400 transition-colors">
-            Painel
-          </Link>
+        <div className="border-t border-gray-700 mt-8 pt-6 text-center text-xs text-gray-500 space-y-1">
+          <p>
+            &copy; {new Date().getFullYear()} {COMPANY.fullName}. Todos os direitos reservados.
+            <span className="mx-1">·</span>
+            <Link href="/admin/login" className="hover:text-gray-400 transition-colors">
+              Painel
+            </Link>
+          </p>
+          <p>
+            Desenvolvido por{" "}
+            <a
+              href="https://www.insumma.com.br"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-primary-gold hover:text-primary-orange transition-colors"
+            >
+              Insumma
+            </a>
+            {" "}— Desenvolvimento de softwares sob demanda
+          </p>
         </div>
       </div>
     </footer>

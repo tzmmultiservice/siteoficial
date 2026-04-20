@@ -38,4 +38,10 @@ yarn-error.log*
 
 # typescript
 *.tsbuildinfo
+
+# docs (local only)
+/docs/
+
+# logos originals
+/logos/
 next-env.d.ts

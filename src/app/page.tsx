@@ -35,6 +35,29 @@ const FEATURED_SCENES = [
   },
 ] as const;
 
+const HERO_SERVICE_IMAGES = [
+  {
+    title: "Revisao e inspeção",
+    image:
+      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "Alinhamento e balanceamento",
+    image:
+      "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "Diagnostico eletronico",
+    image:
+      "https://images.unsplash.com/photo-1619642750830-6d8f4f1d5c92?auto=format&fit=crop&w=1600&q=80",
+  },
+  {
+    title: "Troca de componentes",
+    image:
+      "https://images.unsplash.com/photo-1517524206127-48bbd363f3d7?auto=format&fit=crop&w=1600&q=80",
+  },
+] as const;
+
 export default function Home() {
   return (
     <>
@@ -50,46 +73,95 @@ export default function Home() {
         <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(0,0,0,0.85)_5%,rgba(0,0,0,0.52)_52%,rgba(0,0,0,0.92)_100%)]" />
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 w-full">
-          <div className="max-w-4xl">
-            <span className="inline-flex items-center rounded-full border border-primary-orange/40 bg-primary-orange/15 px-4 py-2 text-xs sm:text-sm font-semibold text-primary-gold mb-6">
-              Oficina de alta performance
-            </span>
+          <div className="grid grid-cols-1 xl:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
+            <div className="max-w-4xl">
+              <div className="inline-flex items-center gap-3 rounded-xl border border-white/15 bg-black/30 px-3 py-2 mb-6">
+                <Image
+                  src="/images/logo-dark.jpeg"
+                  alt={COMPANY.fullName}
+                  width={40}
+                  height={40}
+                  className="rounded-lg ring-1 ring-white/20"
+                />
+                <span className="text-xs sm:text-sm font-semibold text-primary-gold">
+                  Oficina de alta performance
+                </span>
+              </div>
 
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white leading-[0.95] mb-5">
-              Mecanica premium para quem nao aceita servico comum.
-            </h1>
+              <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white leading-[0.95] mb-5">
+                Mecanica premium para quem nao aceita servico comum.
+              </h1>
 
-            <p className="text-lg sm:text-xl text-gray-200 max-w-2xl mb-8 leading-relaxed">
-              Atendimento profissional, previsibilidade de prazo e acompanhamento em tempo real.
-              Seu carro entra em fluxo tecnico, nao em improviso.
-            </p>
+              <p className="text-lg sm:text-xl text-gray-200 max-w-2xl mb-8 leading-relaxed">
+                Atendimento profissional, previsibilidade de prazo e acompanhamento em tempo real.
+                Seu carro entra em fluxo tecnico, nao em improviso.
+              </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 mb-10">
-              <Link href="/agendar" className="btn-primary text-base sm:text-lg !py-3 !px-8">
-                Agendar agora
-              </Link>
-              <a
-                href={COMPANY.whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="btn-secondary !border-green-500 !text-green-300 hover:!bg-green-500 hover:!text-white text-base sm:text-lg !py-3 !px-8"
-              >
-                Falar com especialista
-              </a>
+              <div className="flex flex-col sm:flex-row gap-4 mb-10">
+                <Link href="/agendar" className="btn-primary text-base sm:text-lg !py-3 !px-8">
+                  Agendar agora
+                </Link>
+                <a
+                  href={COMPANY.whatsappLink}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="btn-secondary !border-green-500 !text-green-300 hover:!bg-green-500 hover:!text-white text-base sm:text-lg !py-3 !px-8"
+                >
+                  Falar com especialista
+                </a>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">
+                {[
+                  { label: "Carros atendidos", value: "2.000+" },
+                  { label: "Taxa de retorno", value: "72%" },
+                  { label: "Satisfacao media", value: "4.9/5" },
+                ].map((item) => (
+                  <div key={item.label} className="glass rounded-xl px-4 py-4">
+                    <p className="text-2xl font-extrabold text-primary-gold">{item.value}</p>
+                    <p className="text-xs sm:text-sm text-gray-200">{item.label}</p>
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 max-w-3xl">
-              {[
-                { label: "Carros atendidos", value: "2.000+" },
-                { label: "Taxa de retorno", value: "72%" },
-                { label: "Satisfacao media", value: "4.9/5" },
-              ].map((item) => (
-                <div key={item.label} className="glass rounded-xl px-4 py-4">
-                  <p className="text-2xl font-extrabold text-primary-gold">{item.value}</p>
-                  <p className="text-xs sm:text-sm text-gray-200">{item.label}</p>
+            <aside className="w-full xl:justify-self-end">
+              <div className="glass rounded-2xl p-4 sm:p-5 border border-white/20 shadow-[0_20px_70px_rgba(0,0,0,0.55)]">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-xs tracking-wider uppercase text-primary-gold font-semibold">Quadro de servicos</p>
+                  <div className="flex items-center gap-2 text-[11px] text-gray-200">
+                    <Image
+                      src="/images/logo-dark.jpeg"
+                      alt={COMPANY.name}
+                      width={20}
+                      height={20}
+                      className="rounded"
+                    />
+                    TZM Multi Service
+                  </div>
                 </div>
-              ))}
-            </div>
+
+                <div className="hero-slider rounded-xl border border-dark-border-light h-[300px] sm:h-[340px]">
+                  {HERO_SERVICE_IMAGES.map((item, index) => (
+                    <figure
+                      key={item.title}
+                      className={`hero-slide hero-slide-${index + 1}`}
+                    >
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="h-full w-full object-cover"
+                        loading={index === 0 ? "eager" : "lazy"}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/25 to-black/10" />
+                      <figcaption className="absolute left-4 right-4 bottom-4 text-white text-sm sm:text-base font-semibold">
+                        {item.title}
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            </aside>
           </div>
         </div>
       </section>

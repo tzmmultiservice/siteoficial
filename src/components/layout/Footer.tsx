@@ -85,6 +85,10 @@ export default function Footer() {
 
         <div className="border-t border-gray-700 mt-8 pt-6 text-center text-xs text-gray-500">
           &copy; {new Date().getFullYear()} {COMPANY.fullName}. Todos os direitos reservados.
+          <span className="mx-1">·</span>
+          <Link href="/admin/login" className="hover:text-gray-400 transition-colors">
+            Painel
+          </Link>
         </div>
       </div>
     </footer>

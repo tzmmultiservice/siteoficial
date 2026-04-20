@@ -26,47 +26,48 @@ export default function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-[80vh] flex items-center justify-center bg-surface px-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 relative">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_rgba(230,92,0,0.08)_0%,_transparent_50%)]" />
+      <div className="w-full max-w-md relative">
         <div className="text-center mb-8">
           <Image
             src="/images/logo-light.jpeg"
             alt={COMPANY.fullName}
             width={80}
             height={80}
-            className="mx-auto rounded-xl mb-4"
+            className="mx-auto rounded-xl mb-4 ring-1 ring-white/10"
           />
-          <h1 className="text-2xl font-bold text-dark">Painel Administrativo</h1>
+          <h1 className="text-2xl font-bold text-white">Painel Administrativo</h1>
           <p className="text-gray-500 text-sm mt-1">Acesso restrito ao administrador</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl p-8 shadow-sm">
+        <form onSubmit={handleSubmit} className="glass-card rounded-2xl p-8">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 text-sm rounded-lg p-3 mb-4">
+            <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-sm rounded-xl p-3 mb-4">
               {error}
             </div>
           )}
 
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Email</label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
+                className="input-dark"
                 placeholder="admin@email.com"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+              <label className="block text-sm font-medium text-gray-400 mb-1.5">Senha</label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none transition-all"
+                className="input-dark"
                 placeholder="••••••••"
               />
             </div>

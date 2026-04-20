@@ -99,12 +99,12 @@ export default function AdminAgendamentosPage() {
   return (
     <main className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
       <div className="flex items-center justify-between mb-6">
-        <h2 className="text-2xl font-bold text-dark">Agendamentos</h2>
+        <h2 className="text-2xl font-bold text-white">Agendamentos</h2>
           <div className="flex items-center gap-2">
             <select
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-2 text-sm bg-white"
+              className="input-dark text-sm !py-2"
             >
               <option value="all">Todos</option>
               {STATUS_OPTIONS.map((s) => (
@@ -122,13 +122,13 @@ export default function AdminAgendamentosPage() {
             const isEditing = editingId === a.id;
 
             return (
-              <div key={a.id} className="bg-white rounded-xl shadow-sm overflow-hidden">
+              <div key={a.id} className="glass-card rounded-xl overflow-hidden">
                 {/* Card Header */}
-                <div className="p-5 border-b border-gray-100">
+                <div className="p-5 border-b border-dark-border">
                   <div className="flex items-start justify-between gap-4">
                     <div>
                       <div className="flex items-center gap-3 mb-1">
-                        <h3 className="font-bold text-dark text-lg">{a.customer_name}</h3>
+                        <h3 className="font-bold text-white text-lg">{a.customer_name}</h3>
                         <span
                           className="text-xs font-semibold px-3 py-1 rounded-full"
                           style={{ backgroundColor: config.color + "20", color: config.color }}
@@ -146,7 +146,7 @@ export default function AdminAgendamentosPage() {
                       </p>
                     </div>
                     {a.total_value && (
-                      <p className="text-xl font-bold text-primary-orange shrink-0">
+                      <p className="text-xl font-bold text-primary-gold shrink-0">
                         {formatCurrency(a.total_value)}
                       </p>
                     )}
@@ -195,7 +195,7 @@ export default function AdminAgendamentosPage() {
                       className={`text-sm font-medium px-4 py-2 rounded-lg transition-colors ${
                         isEditing
                           ? "bg-green-500 text-white hover:bg-green-600"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          : "bg-white/5 text-gray-400 hover:bg-white/10 border border-dark-border-light"
                       }`}
                     >
                       {isEditing ? "💾 Salvar" : "✏️ Editar Notas/Valor"}
@@ -212,39 +212,39 @@ export default function AdminAgendamentosPage() {
 
                   {/* Edit form */}
                   {isEditing && (
-                    <div className="mt-4 p-4 bg-surface rounded-lg space-y-3">
+                    <div className="mt-4 p-4 bg-dark-card/80 rounded-xl border border-dark-border space-y-3">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Valor do Serviço (R$)</label>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">Valor do Serviço (R$)</label>
                         <input
                           type="number"
                           value={editForm.total_value}
                           onChange={(e) => setEditForm((p) => ({ ...p, total_value: e.target.value }))}
                           placeholder="Ex: 250.00"
-                          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none"
+                          className="input-dark text-sm"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Notas Internas <span className="text-gray-400">(só admin vê)</span>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                          Notas Internas <span className="text-gray-600">(só admin vê)</span>
                         </label>
                         <textarea
                           value={editForm.admin_notes}
                           onChange={(e) => setEditForm((p) => ({ ...p, admin_notes: e.target.value }))}
                           rows={2}
                           placeholder="Observações internas..."
-                          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none resize-none"
+                          className="input-dark text-sm resize-none"
                         />
                       </div>
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                          Notas para o Cliente <span className="text-gray-400">(visível na página de acompanhamento)</span>
+                        <label className="block text-sm font-medium text-gray-400 mb-1">
+                          Notas para o Cliente <span className="text-gray-600">(visível na página de acompanhamento)</span>
                         </label>
                         <textarea
                           value={editForm.client_notes}
                           onChange={(e) => setEditForm((p) => ({ ...p, client_notes: e.target.value }))}
                           rows={2}
                           placeholder="Ex: Trocamos pastilhas e discos. Recomendamos revisão em 6 meses."
-                          className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none resize-none"
+                          className="input-dark text-sm resize-none"
                         />
                       </div>
                     </div>
@@ -254,15 +254,15 @@ export default function AdminAgendamentosPage() {
                   {!isEditing && (a.admin_notes || a.client_notes) && (
                     <div className="mt-4 space-y-2">
                       {a.admin_notes && (
-                        <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-100">
-                          <p className="text-xs font-semibold text-yellow-700 mb-1">🔒 Nota Interna</p>
-                          <p className="text-sm text-yellow-800">{a.admin_notes}</p>
+                        <div className="p-3 bg-yellow-500/10 rounded-xl border border-yellow-500/20">
+                          <p className="text-xs font-semibold text-yellow-400 mb-1">🔒 Nota Interna</p>
+                          <p className="text-sm text-yellow-300">{a.admin_notes}</p>
                         </div>
                       )}
                       {a.client_notes && (
-                        <div className="p-3 bg-blue-50 rounded-lg border border-blue-100">
-                          <p className="text-xs font-semibold text-blue-700 mb-1">👁️ Nota para o Cliente</p>
-                          <p className="text-sm text-blue-800">{a.client_notes}</p>
+                        <div className="p-3 bg-blue-500/10 rounded-xl border border-blue-500/20">
+                          <p className="text-xs font-semibold text-blue-400 mb-1">👁️ Nota para o Cliente</p>
+                          <p className="text-sm text-blue-300">{a.client_notes}</p>
                         </div>
                       )}
                     </div>

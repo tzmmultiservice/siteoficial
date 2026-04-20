@@ -32,7 +32,7 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
 
   if (checking) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-surface">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin w-10 h-10 border-4 border-primary-orange border-t-transparent rounded-full" />
       </div>
     );
@@ -41,8 +41,8 @@ export default function AdminGuard({ children }: { children: React.ReactNode }) 
   if (!authenticated) return null;
 
   return (
-    <div className="min-h-screen bg-surface">
-      <header className="bg-dark-bg border-b border-gray-800 px-4 sm:px-6 py-4">
+    <div className="min-h-screen">
+      <header className="bg-dark-card/80 backdrop-blur-xl border-b border-dark-border px-4 sm:px-6 py-4 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <Link href="/admin" className="text-white text-xl font-bold">
             TZM <span className="gradient-text">Admin</span>

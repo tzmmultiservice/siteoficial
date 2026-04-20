@@ -100,32 +100,32 @@ export const STATUS_CONFIG: Record<
 > = {
   pending: {
     label: "Agendado",
-    color: "text-yellow-700",
-    bgColor: "bg-yellow-100",
+    color: "#CA8A04",
+    bgColor: "rgba(202,138,4,0.15)",
     emoji: "🟡",
   },
   confirmed: {
     label: "Confirmado",
-    color: "text-blue-700",
-    bgColor: "bg-blue-100",
+    color: "#3B82F6",
+    bgColor: "rgba(59,130,246,0.15)",
     emoji: "🔵",
   },
   in_progress: {
     label: "Em Atendimento",
-    color: "text-orange-700",
-    bgColor: "bg-orange-100",
+    color: "#E65C00",
+    bgColor: "rgba(230,92,0,0.15)",
     emoji: "🟠",
   },
   done: {
     label: "Pronto",
-    color: "text-green-700",
-    bgColor: "bg-green-100",
+    color: "#22C55E",
+    bgColor: "rgba(34,197,94,0.15)",
     emoji: "🟢",
   },
   cancelled: {
     label: "Cancelado",
-    color: "text-red-700",
-    bgColor: "bg-red-100",
+    color: "#EF4444",
+    bgColor: "rgba(239,68,68,0.15)",
     emoji: "🔴",
   },
 };

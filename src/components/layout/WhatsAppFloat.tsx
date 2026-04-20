@@ -6,7 +6,7 @@ export default function WhatsAppFloat() {
       href={COMPANY.whatsappLink}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-lg hover:shadow-xl transition-all duration-300 animate-bounce hover:animate-none"
+      className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white rounded-full w-14 h-14 flex items-center justify-center shadow-[0_0_20px_rgba(34,197,94,0.4)] hover:shadow-[0_0_30px_rgba(34,197,94,0.6)] transition-all duration-300 hover:scale-110 animate-pulse-glow"
       aria-label="Falar com a equipe no WhatsApp"
     >
       <svg className="w-7 h-7" fill="currentColor" viewBox="0 0 24 24">

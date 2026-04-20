@@ -66,7 +66,7 @@ export default function AdminServicosPage() {
 
   return (
     <main className="max-w-5xl mx-auto px-4 sm:px-6 py-8">
-      <h2 className="text-2xl font-bold text-dark mb-6">Gerenciar Serviços</h2>
+      <h2 className="text-2xl font-bold text-white mb-6">Gerenciar Serviços</h2>
 
       <div className="space-y-4">
         {services.map((service) => {
@@ -74,7 +74,7 @@ export default function AdminServicosPage() {
           return (
             <div
               key={service.id}
-              className={`bg-white rounded-xl shadow-sm p-5 transition-opacity ${
+              className={`glass-card rounded-xl p-5 transition-opacity ${
                 !service.active ? "opacity-60" : ""
               }`}
             >
@@ -82,40 +82,40 @@ export default function AdminServicosPage() {
                 <div className="space-y-3">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Nome</label>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Nome</label>
                       <input
                         type="text"
                         value={editForm.name}
                         onChange={(e) => setEditForm((p) => ({ ...p, name: e.target.value }))}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none"
+                        className="input-dark text-sm"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Preço Estimado (R$)</label>
+                      <label className="block text-sm font-medium text-gray-400 mb-1">Preço Estimado (R$)</label>
                       <input
                         type="number"
                         value={editForm.price_estimate}
                         onChange={(e) => setEditForm((p) => ({ ...p, price_estimate: Number(e.target.value) }))}
-                        className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none"
+                        className="input-dark text-sm"
                       />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Descrição</label>
                     <textarea
                       value={editForm.description}
                       onChange={(e) => setEditForm((p) => ({ ...p, description: e.target.value }))}
                       rows={2}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none resize-none"
+                      className="input-dark text-sm resize-none"
                     />
                   </div>
                   <div className="w-48">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Duração (min)</label>
+                    <label className="block text-sm font-medium text-gray-400 mb-1">Duração (min)</label>
                     <input
                       type="number"
                       value={editForm.duration_minutes}
                       onChange={(e) => setEditForm((p) => ({ ...p, duration_minutes: Number(e.target.value) }))}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-primary-orange focus:border-transparent outline-none"
+                      className="input-dark text-sm"
                     />
                   </div>
                   <div className="flex gap-2 pt-2">
@@ -138,9 +138,9 @@ export default function AdminServicosPage() {
                 <div className="flex items-center justify-between gap-4">
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-bold text-dark">{service.name}</h3>
+                      <h3 className="font-bold text-white">{service.name}</h3>
                       {!service.active && (
-                        <span className="text-xs bg-red-100 text-red-600 px-2 py-0.5 rounded-full">Inativo</span>
+                        <span className="text-xs bg-red-500/15 text-red-400 px-2 py-0.5 rounded-full">Inativo</span>
                       )}
                     </div>
                     <p className="text-sm text-gray-500">{service.description}</p>
@@ -151,7 +151,7 @@ export default function AdminServicosPage() {
                   <div className="flex items-center gap-2 shrink-0">
                     <button
                       onClick={() => startEditing(service)}
-                      className="text-sm bg-gray-100 text-gray-700 hover:bg-gray-200 px-3 py-2 rounded-lg transition-colors"
+                      className="text-sm bg-white/5 text-gray-400 hover:bg-white/10 border border-dark-border-light px-3 py-2 rounded-lg transition-colors"
                     >
                       ✏️ Editar
                     </button>
@@ -160,8 +160,8 @@ export default function AdminServicosPage() {
                       disabled={saving}
                       className={`text-sm px-3 py-2 rounded-lg transition-colors ${
                         service.active
-                          ? "bg-red-50 text-red-600 hover:bg-red-100"
-                          : "bg-green-50 text-green-600 hover:bg-green-100"
+                          ? "bg-red-500/15 text-red-400 hover:bg-red-500/25"
+                          : "bg-green-500/15 text-green-400 hover:bg-green-500/25"
                       }`}
                     >
                       {service.active ? "Desativar" : "Ativar"}

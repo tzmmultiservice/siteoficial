@@ -1,36 +1,101 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# TZM Multi Service — Mecânica Automotiva
 
-## Getting Started
+Site institucional e sistema de agendamento online da **TZM Multi Service**, oficina mecânica em São Gabriel, BA.
 
-First, run the development server:
+## Stack
+
+| Tecnologia | Versão | Uso |
+|------------|--------|-----|
+| Next.js | 16.2.4 | Framework (App Router, Static Export) |
+| React | 19.2.4 | UI |
+| TypeScript | ^5 | Tipagem |
+| Tailwind CSS | ^4 | Estilização (`@theme inline`) |
+| Supabase | Cloud | PostgreSQL + Auth + Realtime + Edge Functions |
+| Render | Static | Hospedagem e CDN |
+
+## Funcionalidades
+
+- **Site público:** Homepage, serviços, contato, localização (Google Maps)
+- **Agendamento online:** Wizard de 5 etapas com bloqueio de horários já reservados
+- **Tracking em tempo real:** Acompanhamento via Supabase Realtime (WebSocket)
+- **Painel admin:** Dashboard, gestão de agendamentos e serviços, notificação WhatsApp
+- **Autenticação:** Supabase Auth (email/password) para área admin
+- **Email transacional:** Edge Function com Resend (preparado, integração futura)
+
+## Quick Start
 
 ```bash
+# Instalar dependências
+npm install
+
+# Desenvolvimento
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# Build de produção (static export → /out)
+npm run build
+
+# Lint
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Variáveis de Ambiente
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Copie `.env.local.example` para `.env.local` e preencha:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
+```
 
-## Learn More
+> O build funciona sem variáveis (usa placeholder), mas o site precisa delas para funcionar.
 
-To learn more about Next.js, take a look at the following resources:
+## Estrutura
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+src/
+├── app/
+│   ├── (public)/          # Páginas públicas (Header + Footer)
+│   │   ├── agendar/       # Wizard de agendamento
+│   │   ├── acompanhar/    # Tracking realtime
+│   │   ├── servicos/      # Lista de serviços
+│   │   ├── pecas/         # Cadastro de interesse
+│   │   └── contato/       # Informações de contato
+│   └── admin/
+│       ├── login/         # Login
+│       └── (protected)/   # Dashboard, agendamentos, serviços
+├── components/
+│   ├── layout/            # Header, Footer, WhatsAppFloat
+│   └── admin/             # AdminGuard
+└── lib/
+    ├── api.ts             # Queries centralizadas ao Supabase
+    ├── auth.ts            # Wrappers de autenticação
+    ├── supabase.ts        # Client singleton
+    ├── types.ts           # Interfaces TypeScript
+    ├── constants.ts       # Dados da empresa, serviços, status
+    └── utils.ts           # Formatadores e helpers
+supabase/
+├── migration.sql          # DDL + RLS + Seed
+└── functions/             # Edge Function de email
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deploy
 
-## Deploy on Vercel
+O site é 100% estático (HTML/CSS/JS) hospedado no Render como static site. O `render.yaml` na raiz configura tudo automaticamente.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Documentação Completa
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+A pasta `docs/` (local, não commitada) contém documentação detalhada:
+- `ARCHITECTURE.md` — Visão geral da arquitetura e fluxos de dados
+- `ROUTES.md` — Todas as rotas com detalhes de comportamento
+- `DATABASE.md` — Schema, RLS, triggers, seed, manutenção
+- `API-LAYER.md` — Funções de API, assinaturas, tratamento de erros
+- `AUTH.md` — Fluxo de autenticação e proteção de rotas
+- `COMPONENTS.md` — Inventário completo de componentes
+- `STYLING.md` — Design system, paleta, Tailwind v4
+- `DEPLOY.md` — Guia completo de deploy
+- `CONVENTIONS.md` — Regras de código e gotchas
+- `EDGE-FUNCTIONS.md` — Edge Function de email
+
+---
+
+&copy; TZM Multi Service — Mecânica Automotiva. São Gabriel, BA.

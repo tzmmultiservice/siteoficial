@@ -37,24 +37,24 @@ const FEATURED_SCENES = [
 
 const HERO_SERVICE_IMAGES = [
   {
-    title: "Revisao e inspeção",
+    title: "Diagnostico de performance",
     image:
-      "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Alinhamento e balanceamento",
+    title: "Inspecao visual e check-up",
     image:
-      "https://images.unsplash.com/photo-1530124566582-a618bc2615dc?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Diagnostico eletronico",
+    title: "Servico de pecas e componentes",
     image:
-      "https://images.unsplash.com/photo-1619642750830-6d8f4f1d5c92?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1487754180451-c456f719a1fc?auto=format&fit=crop&w=1600&q=80",
   },
   {
-    title: "Troca de componentes",
+    title: "Entrega com padrao premium",
     image:
-      "https://images.unsplash.com/photo-1517524206127-48bbd363f3d7?auto=format&fit=crop&w=1600&q=80",
+      "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=1600&q=80",
   },
 ] as const;
 
@@ -75,17 +75,18 @@ export default function Home() {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-16 w-full">
           <div className="grid grid-cols-1 xl:grid-cols-[1.05fr_0.95fr] gap-8 items-center">
             <div className="max-w-4xl">
-              <div className="inline-flex items-center gap-3 rounded-xl border border-white/15 bg-black/30 px-3 py-2 mb-6">
+              <div className="mb-6 inline-flex items-center gap-4 rounded-2xl border border-white/20 bg-black/45 px-4 py-3 shadow-[0_10px_40px_rgba(0,0,0,0.45)]">
                 <Image
-                  src="/images/logo-dark.jpeg"
+                  src="/images/logo-light.jpeg"
                   alt={COMPANY.fullName}
-                  width={40}
-                  height={40}
-                  className="rounded-lg ring-1 ring-white/20"
+                  width={58}
+                  height={58}
+                  className="rounded-xl ring-2 ring-primary-gold/30"
                 />
-                <span className="text-xs sm:text-sm font-semibold text-primary-gold">
-                  Oficina de alta performance
-                </span>
+                <div>
+                  <p className="text-xl sm:text-2xl font-black text-white leading-tight">TZM Multi Service</p>
+                  <p className="text-xs sm:text-sm font-semibold tracking-wider uppercase text-primary-gold">Mecanica Automotiva</p>
+                </div>
               </div>
 
               <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white leading-[0.95] mb-5">

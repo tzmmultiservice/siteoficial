@@ -31,7 +31,7 @@ const FEATURED_SCENES = [
     title: "Controle de Qualidade",
     description: "Checklist visual, testes finais e entrega transparente com orientacao ao cliente.",
     image:
-      "https://images.unsplash.com/photo-1632823471565-1ecdf3b01d9b?auto=format&fit=crop&w=1400&q=80",
+      "https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=1400&q=80",
   },
 ] as const;
 
